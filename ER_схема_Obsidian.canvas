@@ -1,0 +1,19 @@
+{
+	"nodes":[
+		{"id":"table_doctor","type":"text","text":"# doctor\n**Врачи**\n\n- `doctor_id` bigint — **PK**\n- `specialty_id` bigint — **FK → specialty**\n- `license_number` varchar(30) — **UNIQUE**\n- `full_name` text — **NOT NULL**\n- `is_active` boolean — по умолчанию `true`\n\n`specialty_id` обязателен.","x":490,"y":0,"width":390,"height":350,"color":"4"},
+		{"id":"table_appointment_diagnosis","type":"text","text":"# appointment_diagnosis\n**Диагноз на конкретном приёме**\n\n- `appointment_id` bigint — **PK + FK → appointment**\n- `diagnosis_id` bigint — **PK + FK → diagnosis**\n- `is_primary` boolean — основной диагноз\n- `notes` text — может быть `NULL`\n\n**Составной PK:** `(appointment_id, diagnosis_id)`\n**Частичный UNIQUE:** не более одного `is_primary = true` на приём.","x":490,"y":1080,"width":530,"height":400,"color":"6"},
+		{"id":"table_specialty","type":"text","text":"# specialty\n**Специальности врачей**\n\n- `specialty_id` bigint — **PK**\n- `name` text — **UNIQUE, NOT NULL**\n\nОдна специальность может быть у многих врачей.","x":-80,"y":90,"width":360,"height":260,"color":"4"},
+		{"id":"table_patient","type":"text","text":"# patient\n**Пациенты**\n\n- `patient_id` bigint — **PK**\n- `medical_record_number` varchar(20) — **UNIQUE**\n- `full_name` text — **NOT NULL**\n- `birth_date` date — **NOT NULL**\n- `phone` varchar(20) — может быть `NULL`\n- `created_at` timestamptz — по умолчанию `now()`","x":1320,"y":40,"width":430,"height":350,"color":"4"},
+		{"id":"table_diagnosis","type":"text","text":"# diagnosis\n**Справочник диагнозов**\n\n- `diagnosis_id` bigint — **PK**\n- `code` varchar(12) — **UNIQUE, NOT NULL**\n- `name` text — **NOT NULL**\n","x":-120,"y":860,"width":390,"height":300,"color":"4"},
+		{"id":"table_prescription","type":"text","text":"# prescription\n**Назначения препаратов**\n\n- `prescription_id` bigint — **PK**\n- `appointment_id` bigint — **FK → appointment**\n- `medication_name` text — препарат\n- `single_dose` numeric(8,2) — доза `> 0`\n- `dose_unit` text — единица дозы\n- `times_per_day` smallint — 1–12\n- `duration_days` smallint — 1–365\n- `instructions` text — может быть `NULL`","x":1220,"y":900,"width":450,"height":460,"color":"4"},
+		{"id":"table_appointment","type":"text","text":"# appointment\n**Приёмы**\n\n- `appointment_id` bigint — **PK**\n- `patient_id` bigint — **FK → patient**\n- `doctor_id` bigint — **FK → doctor**\n- `scheduled_at` timestamptz — начало\n- `duration_minutes` integer — 10–240\n- `status` text — `scheduled`, `completed`, `cancelled`\n- `complaint` text — может быть `NULL`\n\n**Составные UNIQUE:**\n`(doctor_id, scheduled_at)`\n`(patient_id, scheduled_at)`","x":490,"y":480,"width":480,"height":470,"color":"5"}
+	],
+	"edges":[
+		{"id":"edge_specialty_doctor","fromNode":"table_specialty","fromSide":"right","toNode":"table_doctor","toSide":"left","label":"1 → N"},
+		{"id":"edge_doctor_appointment","fromNode":"table_doctor","fromSide":"bottom","toNode":"table_appointment","toSide":"top","label":"1 → N"},
+		{"id":"edge_patient_appointment","fromNode":"table_patient","fromSide":"bottom","toNode":"table_appointment","toSide":"right","label":"1 → N"},
+		{"id":"edge_appointment_appointment_diagnosis","fromNode":"table_appointment","fromSide":"bottom","toNode":"table_appointment_diagnosis","toSide":"top","label":"1 → N"},
+		{"id":"edge_diagnosis_appointment_diagnosis","fromNode":"table_diagnosis","fromSide":"right","toNode":"table_appointment_diagnosis","toSide":"left","label":"1 → N"},
+		{"id":"edge_appointment_prescription","fromNode":"table_appointment","fromSide":"right","toNode":"table_prescription","toSide":"top","label":"1 → N"}
+	]
+}
